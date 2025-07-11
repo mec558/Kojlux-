@@ -1,2 +1,405 @@
-# Kojlux-
-Mobile Car detailing 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kojlux Mobile Detailing</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#121212; color:#fff; }
+    header { display:flex; justify-content:space-between; align-items:center; background:maroon; padding:10px 20px; }
+    #menu-button, #calendar-icon { font-size:24px; cursor:pointer; }
+    .hidden { display:none; }
+    section { padding:40px 20px; }
+    footer { background:#111; color:gray; text-align:center; padding:10px; }
+    button, a.book-button {
+      display:inline-block;
+      margin-top:20px;
+      padding:10px 25px;
+      background:maroon;
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    button:hover, a.book-button:hover { background:deepskyblue; }
+    input { padding:8px; margin:5px 0; border-radius:5px; }
+
+    #hero {
+      background:url('https://upload.wikimedia.org/wikipedia/commons/6/6d/Lamborghini_Aventador_LP700-4.jpg') no-repeat center center fixed;
+      background-size:cover;
+      height:90vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    #hero .overlay {
+      background:rgba(0,0,0,0.6);
+      padding:40px;
+      border-radius:12px;
+      text-align:center;
+    }
+
+    #hero h2 { font-size:2em; color:deepskyblue; }
+
+    nav#side-menu {
+      position:fixed;
+      top:0;
+      left:0;
+      width:250px;
+      height:100%;
+      background:#222;
+      padding-top:60px;
+      display:none;
+    }
+
+    nav#side-menu ul { list-style:none; padding:0; }
+    nav#side-menu li {
+      padding:15px;
+      border-bottom:1px solid #444;
+      cursor:pointer;
+    }
+    nav#side-menu li:hover { background:#333; }
+
+    #calendar-container { max-width:320px; margin:0 auto; }
+    #calendar-header { display:flex; justify-content:space-between; align-items:center; color:deepskyblue; }
+    #calendar-header button { background:none; border:none; color:#fff; font-size:1.2em; cursor:pointer; }
+    #calendar-table { width:100%; border-collapse:collapse; margin-top:10px; }
+    #calendar-table th, #calendar-table td {
+      width:14.28%;
+      height:40px;
+      text-align:center;
+      cursor:pointer;
+    }
+    #calendar-table td.disabled { color:#555; cursor:not-allowed; }
+    #calendar-table td.selected { background:maroon; border-radius:50%; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div id="menu-button" onclick="toggleMenu()">☰</div>
+    <h1>Kojlux</h1>
+    <div id="calendar-icon" onclick="openSection('calendar')">📅</div>
+  </header>
+
+  <nav id="side-menu" class="hidden">
+    <ul>
+      <li onclick="openSection('profile')">🧍‍♂️ Profile</li>
+      <li onclick="openSection('reviews')">💬 My Reviews</li>
+      <li onclick="openSection('appointments')">📅 My Appointments</li>
+      <li onclick="openSection('help')">❓ Help</li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="overlay">
+      <h2>Welcome to Kojlux Mobile Car Detailing</h2>
+      <p>Get your car looking like new with Kojlux. To book, tap the <strong>Book Now</strong> button below.</p>
+      <button class="book-button" onclick="alert('To book, click the calendar icon on the top right and select your date.')">Book Now</button>
+    </div>
+  </section>
+
+  <section id="services">
+    <h3>Our Services</h3>
+    <ul>
+      <li><strong>Full Detailing – $50</strong><br>Inside and outside cleaning</li>
+      <li><strong>Exterior Wash – $20</strong><br>Outside only</li>
+    </ul>
+  </section>
+
+  <section id="calendar" class="hidden">
+    <h3>Select a Date</h3>
+    <div id="calendar-container">
+      <div id="calendar-header">
+        <button id="prev-month">&lt;</button>
+        <h4 id="month-year"></h4>
+        <button id="next-month">&gt;</button>
+      </div>
+      <table id="calendar-table">
+        <thead>
+          <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="profile" class="hidden"></section>
+  <section id="reviews" class="hidden"></section>
+  <section id="appointments" class="hidden"></section>
+  <section id="help" class="hidden">
+    <h3>How Kojlux Booking Works</h3>
+    <p>To book, click the calendar icon on the top right and select the date you’d like to book.</p>
+    <p>✅ Send a $1 tip to confirm your booking:</p>
+    <p><strong>Cash App: $16clem</strong></p>
+    <p>💵 Pay the remaining balance in cash on appointment day.</p>
+    <p>This ensures you’re serious and avoids no‑shows.</p>
+  </section>
+
+  <div id="tip-popup" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:1000;color:#fff;text-align:center;padding:30px;">
+    <h3>Before You Book</h3>
+    <p>Please send a $1 tip to confirm your booking.</p>
+    <button onclick="openCashApp()">Send Tip in Cash App</button><br><br>
+    <button onclick="continueToBooking()">I’ve Sent the Tip – Continue</button><br><br>
+    <button onclick="document.getElementById('tip-popup').classList.add('hidden')">Cancel</button>
+  </div>
+
+  <footer>
+    <p>Kojlux – Fresno, CA | © 2025</p>
+  </footer>
+
+  <script>
+    // MENU TOGGLE
+    function toggleMenu() {
+      const m = document.getElementById('side-menu');
+      m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // SECTION HANDLER
+    function openSection(id) {
+      ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
+        document.getElementById(s).classList.add('hidden');
+      });
+      if (id === 'profile') loadProfile();
+      if (id === 'calendar') buildCalendar();
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      document.getElementById('side-menu').style.display = 'none';
+      el.scrollIntoView({ behavior: 'smooth' });
+      alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
+    }
+
+    // PROFILE SECTION
+    function loadProfile() {
+      const e = localStorage.getItem('kojlux_email') || '';
+      const p = localStorage.getItem('kojlux_phone') || '';
+      document.getElementById('profile').innerHTML = `
+        <h3>My Profile</h3>
+        <label>Email:</label><br>
+        <input type="email" id="emailInput" value="${e}"><br><br>
+        <label>Phone:</label><br>
+        <input type="tel" id="phoneInput" value="${p}"><br><br>
+        <button onclick="saveProfile()">Save</button>
+      `;
+    }
+
+    function saveProfile() {
+      localStorage.setItem('kojlux_email', document.getElementById('emailInput').value);
+      localStorage.setItem('kojlux_phone', document.getElementById('phoneInput').value);
+      alert('Profile saved!');
+    }
+
+    // CALENDAR
+    let today = new Date(),
+        currentMonth = today.getMonth(),
+        currentYear = today.getFullYear(),
+        lastCell = null;
+
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'],
+          tableBody = document.querySelector('#calendar-table tbody'),
+          monthYearText = document.getElementById('month-year');
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+      currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      buildCalendar();
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+      currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      buildCalendar();
+    });
+
+    function buildCalendar() {
+      tableBody.innerHTML = '';
+      monthYearText.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      let firstDay = new Date(currentYear, currentMonth, 1).getDay(),
+          daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(),
+          date = 1;
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement('td');
+          if (i === 0 && j < firstDay || date > daysInMonth) {
+            cell.classList.add('disabled');
+          } else {
+            cell.textContent = date;
+            cell.addEventListener('click', () => selectDate(cell, date));
+            date++;
+          }
+          row.appendChild(cell);
+        }
+        tableBody.appendChild(row);
+        if (date > daysInMonth) break;
+      }
+    }
+
+    function selectDate(cell, date) {
+      if (cell.classList.contains('disabled')) return;
+      if (lastCell) lastCell.classList.remove('selected');
+      cell.classList.add('selected'); lastCell = cell;
+      document.getElementById('tip-popup').classList.remove('hidden');
+      const full = new Date(currentYear, currentMonth, date);
+      const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+      window.pendingDate = full.toLocaleDateString('en-US', opts);
+    }
+
+    // FINAL WHATSAPP + CASH APP FUNCTIONS
+    function continueToBooking() {
+      window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
+    }
+
+    function openCashApp() {
+      window.open('https://cash.app/$16clem', '_blank');
+    }
+  </script>
+</body>
+</html>
+<script>
+  // Save the selected appointment to localStorage
+  function continueToBooking() {
+    if (!window.pendingDate) {
+      alert('No date selected!');
+      return;
+    }
+
+    // Get existing appointments
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    // Add this one
+    booked.push({
+      date: window.pendingDate,
+      status: 'upcoming'
+    });
+
+    // Save back
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+
+    // Open WhatsApp
+    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
+  }
+
+  // Load Appointments Section
+  function loadAppointments() {
+    let section = document.getElementById('appointments');
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    if (booked.length === 0) {
+      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
+      return;
+    }
+
+    let html = '<h3>My Appointments</h3><ul>';
+    booked.forEach((item, i) => {
+      const color = item.status === 'done' ? 'red' : 'lightgreen';
+      html += `<li style="margin-bottom:10px;">
+        <span style="color:${color};">${item.date} – ${item.status}</span>
+        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
+      </li>`;
+    });
+    html += '</ul>';
+    section.innerHTML = html;
+  }
+
+  function deleteAppointment(index) {
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+    booked.splice(index, 1);
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    loadAppointments();
+  }
+
+  // Hook into section opening
+  function openSection(id) {
+    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+
+    if (id === 'profile') loadProfile();
+    if (id === 'calendar') buildCalendar();
+    if (id === 'appointments') loadAppointments(); // ✅ Hook added here
+
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    document.getElementById('side-menu').style.display = 'none';
+    el.scrollIntoView({ behavior: 'smooth' });
+    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
+  }
+</script>
+<script>
+  function selectDate(cell, date) {
+    if (cell.classList.contains('disabled')) return;
+
+    if (lastCell) lastCell.classList.remove('selected');
+    cell.classList.add('selected');
+    lastCell = cell;
+
+    const full = new Date(currentYear, currentMonth, date);
+    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+    window.pendingDate = full.toLocaleDateString('en-US', opts);
+
+    // ✅ Save the selected date IMMEDIATELY to appointments
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    // Check if already exists
+    if (!booked.some(b => b.date === window.pendingDate)) {
+      booked.push({ date: window.pendingDate, status: 'upcoming' });
+      localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    }
+
+    // Show tip popup
+    document.getElementById('tip-popup').classList.remove('hidden');
+  }
+
+  // Keep the booking and appointment display functions
+  function continueToBooking() {
+    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
+  }
+
+  function openCashApp() {
+    window.open('https://cash.app/$16clem', '_blank');
+  }
+
+  function loadAppointments() {
+    let section = document.getElementById('appointments');
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    if (booked.length === 0) {
+      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
+      return;
+    }
+
+    let html = '<h3>My Appointments</h3><ul>';
+    booked.forEach((item, i) => {
+      const color = item.status === 'done' ? 'red' : 'lightgreen';
+      html += `<li style="margin-bottom:10px;">
+        <span style="color:${color};">${item.date} – ${item.status}</span>
+        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
+      </li>`;
+    });
+    html += '</ul>';
+    section.innerHTML = html;
+  }
+
+  function deleteAppointment(index) {
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+    booked.splice(index, 1);
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    loadAppointments();
+  }
+
+  function openSection(id) {
+    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+
+    if (id === 'profile') loadProfile();
+    if (id === 'calendar') buildCalendar();
+    if (id === 'appointments') loadAppointments();
+
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    document.getElementById('side-menu').style.display = 'none';
+    el.scrollIntoView({ behavior: 'smooth' });
+    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
+  }
+</script>
