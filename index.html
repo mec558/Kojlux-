@@ -403,3 +403,32 @@
     alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
   }
   </script>
+<script>
+  function selectDate(cell, day) {
+    if (cell.classList.contains('disabled')) return;
+
+    if (lastCell) lastCell.classList.remove('selected');
+    cell.classList.add('selected');
+    lastCell = cell;
+
+    const selectedDate = new Date(currentYear, currentMonth, day);
+    const formatted = selectedDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    window.pendingDate = formatted;
+
+    // Save appointment instantly
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    if (!booked.some(b => b.date === formatted)) {
+      booked.push({ date: formatted, status: 'upcoming' });
+      localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    }
+
+    // Show tip message
+    document.getElementById('tip-popup').classList.remove('hidden');
+  }
+</script>
