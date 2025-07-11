@@ -254,4 +254,152 @@
     }
   </script>
 </body>
-  </html>
+</html>
+<script>
+  // Save the selected appointment to localStorage
+  function continueToBooking() {
+    if (!window.pendingDate) {
+      alert('No date selected!');
+      return;
+    }
+
+    // Get existing appointments
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    // Add this one
+    booked.push({
+      date: window.pendingDate,
+      status: 'upcoming'
+    });
+
+    // Save back
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+
+    // Open WhatsApp
+    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
+  }
+
+  // Load Appointments Section
+  function loadAppointments() {
+    let section = document.getElementById('appointments');
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    if (booked.length === 0) {
+      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
+      return;
+    }
+
+    let html = '<h3>My Appointments</h3><ul>';
+    booked.forEach((item, i) => {
+      const color = item.status === 'done' ? 'red' : 'lightgreen';
+      html += `<li style="margin-bottom:10px;">
+        <span style="color:${color};">${item.date} – ${item.status}</span>
+        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
+      </li>`;
+    });
+    html += '</ul>';
+    section.innerHTML = html;
+  }
+
+  function deleteAppointment(index) {
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+    booked.splice(index, 1);
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    loadAppointments();
+  }
+
+  // Hook into section opening
+  function openSection(id) {
+    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+
+    if (id === 'profile') loadProfile();
+    if (id === 'calendar') buildCalendar();
+    if (id === 'appointments') loadAppointments(); // ✅ Hook added here
+
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    document.getElementById('side-menu').style.display = 'none';
+    el.scrollIntoView({ behavior: 'smooth' });
+    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
+  }
+</script>
+<script>
+  function selectDate(cell, date) {
+    if (cell.classList.contains('disabled')) return;
+
+    if (lastCell) lastCell.classList.remove('selected');
+    cell.classList.add('selected');
+    lastCell = cell;
+
+    const full = new Date(currentYear, currentMonth, date);
+    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+    window.pendingDate = full.toLocaleDateString('en-US', opts);
+
+    // ✅ Save the selected date IMMEDIATELY to appointments
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    // Check if already exists
+    if (!booked.some(b => b.date === window.pendingDate)) {
+      booked.push({ date: window.pendingDate, status: 'upcoming' });
+      localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    }
+
+    // Show tip popup
+    document.getElementById('tip-popup').classList.remove('hidden');
+  }
+
+  // Keep the booking and appointment display functions
+  function continueToBooking() {
+    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
+  }
+
+  function openCashApp() {
+    window.open('https://cash.app/$16clem', '_blank');
+  }
+
+  function loadAppointments() {
+    let section = document.getElementById('appointments');
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+
+    if (booked.length === 0) {
+      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
+      return;
+    }
+
+    let html = '<h3>My Appointments</h3><ul>';
+    booked.forEach((item, i) => {
+      const color = item.status === 'done' ? 'red' : 'lightgreen';
+      html += `<li style="margin-bottom:10px;">
+        <span style="color:${color};">${item.date} – ${item.status}</span>
+        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
+      </li>`;
+    });
+    html += '</ul>';
+    section.innerHTML = html;
+  }
+
+  function deleteAppointment(index) {
+    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+    booked.splice(index, 1);
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+    loadAppointments();
+  }
+
+  function openSection(id) {
+    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+
+    if (id === 'profile') loadProfile();
+    if (id === 'calendar') buildCalendar();
+    if (id === 'appointments') loadAppointments();
+
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    document.getElementById('side-menu').style.display = 'none';
+    el.scrollIntoView({ behavior: 'smooth' });
+    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
+  }
+  </script>
