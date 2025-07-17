@@ -447,3 +447,68 @@
     openSection('appointments');
   }
 </script>
+<script>
+// Store clicked calendar date into localStorage and show it in "My Appointments"
+document.addEventListener("DOMContentLoaded", function () {
+  const calendarDates = document.querySelectorAll(".calendar-date"); // Adjust to your calendar class
+  const appointmentList = document.getElementById("myAppointments"); // Section to show appointments
+
+  // Load saved appointments from localStorage
+  let savedAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
+
+  function renderAppointments() {
+    if (!appointmentList) return;
+    appointmentList.innerHTML = "";
+    savedAppointments.forEach((date) => {
+      const li = document.createElement("li");
+      li.textContent = date;
+      appointmentList.appendChild(li);
+    });
+  }
+
+  calendarDates.forEach((dateEl) => {
+    dateEl.addEventListener("click", function () {
+      const selectedDate = this.getAttribute("data-date");
+      if (!savedAppointments.includes(selectedDate)) {
+        savedAppointments.push(selectedDate);
+        localStorage.setItem("appointments", JSON.stringify(savedAppointments));
+        renderAppointments();
+      }
+    });
+  });
+
+  renderAppointments();
+});
+</script>
+<script>
+  // Make calendar memory strong
+  document.querySelectorAll('.calendar-date').forEach(dateEl => {
+    dateEl.addEventListener('click', () => {
+      const selectedDate = dateEl.getAttribute('data-date');
+
+      // Save to localStorage
+      let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      if (!appointments.includes(selectedDate)) {
+        appointments.push(selectedDate);
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+      }
+
+      // Add to My Appointments
+      updateAppointmentsUI();
+    });
+  });
+
+  function updateAppointmentsUI() {
+    const list = document.getElementById('myAppointments');
+    list.innerHTML = ''; // clear previous
+    let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    appointments.forEach(date => {
+      const li = document.createElement('li');
+      li.textContent = date;
+      list.appendChild(li);
+    });
+  }
+
+  // Load on page
+  updateAppointmentsUI();
+</script>
