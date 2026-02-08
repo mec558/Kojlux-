@@ -139,7 +139,7 @@
     <h3>Before You Book</h3>
     <p>Please Make Sure TO have a solid mind of when you want the detail.</p>
     
-    <button onclick="window.location.href='sms:5593168075?body=Hey LaunchPoint, Can I get a website with... (describe how you want it)'">PROCEED</button>
+    <button onclick="window.location.href='sms:5593168075?body=Hey Kojlux, Can I get a full detail on the ...">PROCEED</button>
     
     <button onclick="document.getElementById('tip-popup').classList.add('hidden')">Cancel</button>
   </div>
