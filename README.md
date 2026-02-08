@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kojlux Mobile Detailing</title>
+  <title>Kojlux Mobile Car Detailing</title>
   <style>
     body { margin:0; font-family:Arial,sans-serif; background:#121212; color:#fff; }
     header { display:flex; justify-content:space-between; align-items:center; background:maroon; padding:10px 20px; }
@@ -86,8 +86,6 @@
   <nav id="side-menu" class="hidden">
     <ul>
       <li onclick="openSection('profile')">🧍‍♂️ Profile</li>
-      <li onclick="openSection('reviews')">💬 My Reviews</li>
-      <li onclick="openSection('appointments')">📅 My Appointments</li>
       <li onclick="openSection('help')">❓ Help</li>
     </ul>
   </nav>
@@ -130,18 +128,19 @@
   <section id="appointments" class="hidden"></section>
   <section id="help" class="hidden">
     <h3>How Kojlux Booking Works</h3>
-    <p>To book, click the calendar icon on the top right and select the date you’d like to book.</p>
-    <p>✅ Send a $1 tip to confirm your booking:</p>
-    <p><strong>Cash App: $16clem</strong></p>
-    <p>💵 Pay the remaining balance in cash on appointment day.</p>
-    <p>This ensures you’re serious and avoids no‑shows.</p>
+    <p>-To book, click the calendar icon on the top right and select the date you’d like to book.</p>
+    <p>-The calender is to help you decide when to book:</p>
+    <p>You'll be charged a payment of $50 after the detail is done</p>
+    
+    
   </section>
 
   <div id="tip-popup" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:1000;color:#fff;text-align:center;padding:30px;">
     <h3>Before You Book</h3>
-    <p>Please send a $1 tip to confirm your booking.</p>
-    <button onclick="openCashApp()">Send Tip in Cash App</button><br><br>
-    <button onclick="continueToBooking()">I’ve Sent the Tip – Continue</button><br><br>
+    <p>Please Make Sure TO have a solid mind of when you want the detail.</p>
+    
+    <button onclick="window.location.href='sms:5593168075?body=Hey LaunchPoint, Can I get a website with... (describe how you want it)'">PROCEED</button>
+    
     <button onclick="document.getElementById('tip-popup').classList.add('hidden')">Cancel</button>
   </div>
 
