@@ -1,514 +1,1057 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kojlux Mobile Detailing</title>
-  <style>
-    body { margin:0; font-family:Arial,sans-serif; background:#121212; color:#fff; }
-    header { display:flex; justify-content:space-between; align-items:center; background:maroon; padding:10px 20px; }
-    #menu-button, #calendar-icon { font-size:24px; cursor:pointer; }
-    .hidden { display:none; }
-    section { padding:40px 20px; }
-    footer { background:#111; color:gray; text-align:center; padding:10px; }
-    button, a.book-button {
-      display:inline-block;
-      margin-top:20px;
-      padding:10px 25px;
-      background:maroon;
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-    }
-    button:hover, a.book-button:hover { background:deepskyblue; }
-    input { padding:8px; margin:5px 0; border-radius:5px; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kojlux Mobile Detailing</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --maroon: #7a0020;
+  --maroon-light: #a0002a;
+  --maroon-dark: #4a0012;
+  --sky: #00b4d8;
+  --sky-dim: #0077a8;
+  --bg: #0d0d0d;
+  --surface: #181818;
+  --surface2: #222;
+  --border: #2a2a2a;
+  --text: #f0f0f0;
+  --muted: #888;
+  --radius: 16px;
+  --header-h: 62px;
+}
 
-    #hero {
-      background:url('https://upload.wikimedia.org/wikipedia/commons/6/6d/Lamborghini_Aventador_LP700-4.jpg') no-repeat center center fixed;
-      background-size:cover;
-      height:90vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-    #hero .overlay {
-      background:rgba(0,0,0,0.6);
-      padding:40px;
-      border-radius:12px;
-      text-align:center;
-    }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
 
-    #hero h2 { font-size:2em; color:deepskyblue; }
+/* ── HEADER ── */
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: rgba(13,13,13,0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 900;
+}
 
-    nav#side-menu {
-      position:fixed;
-      top:0;
-      left:0;
-      width:250px;
-      height:100%;
-      background:#222;
-      padding-top:60px;
-      display:none;
-    }
+.logo {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 28px;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #fff 30%, var(--sky));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-    nav#side-menu ul { list-style:none; padding:0; }
-    nav#side-menu li {
-      padding:15px;
-      border-bottom:1px solid #444;
-      cursor:pointer;
-    }
-    nav#side-menu li:hover { background:#333; }
+.icon-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  color: var(--text);
+  user-select: none;
+}
+.icon-btn:hover { background: var(--surface2); transform: scale(1.06); }
+.icon-btn:active { transform: scale(0.94); }
 
-    #calendar-container { max-width:320px; margin:0 auto; }
-    #calendar-header { display:flex; justify-content:space-between; align-items:center; color:deepskyblue; }
-    #calendar-header button { background:none; border:none; color:#fff; font-size:1.2em; cursor:pointer; }
-    #calendar-table { width:100%; border-collapse:collapse; margin-top:10px; }
-    #calendar-table th, #calendar-table td {
-      width:14.28%;
-      height:40px;
-      text-align:center;
-      cursor:pointer;
-    }
-    #calendar-table td.disabled { color:#555; cursor:not-allowed; }
-    #calendar-table td.selected { background:maroon; border-radius:50%; }
-  </style>
+/* ── SIDE DRAWER ── */
+#drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 950;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+#drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+#drawer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 280px; height: 100%;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  z-index: 960;
+  transform: translateX(-100%);
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+}
+#drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-logo {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--sky);
+}
+
+.drawer-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s;
+}
+.drawer-close:hover { color: var(--text); }
+
+.drawer-nav {
+  flex: 1;
+  padding: 12px 0;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.18s;
+  font-size: 15px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+.drawer-item:hover { background: rgba(255,255,255,0.04); border-left-color: var(--maroon); }
+.drawer-item .d-icon { font-size: 20px; width: 28px; text-align: center; }
+
+.drawer-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── FULL-SCREEN PANELS ── */
+.screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 800;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  opacity: 0;
+}
+.screen.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.screen-header {
+  position: sticky;
+  top: 0;
+  background: rgba(13,13,13,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 14px;
+  z-index: 10;
+}
+
+.back-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: var(--surface2); }
+.back-btn:active { transform: scale(0.92); }
+
+.screen-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+.screen-body {
+  padding: 28px 20px 60px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── HOME ── */
+#home {
+  position: relative;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  overflow-x: hidden;
+}
+
+.hero {
+  min-height: calc(100vh - var(--header-h));
+  background: url('https://upload.wikimedia.org/wikipedia/commons/6/6d/Lamborghini_Aventador_LP700-4.jpg') no-repeat center center / cover;
+  display: flex;
+  align-items: flex-end;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(13,13,13,0.85) 70%, var(--bg) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: var(--maroon);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(44px, 12vw, 72px);
+  line-height: 0.95;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.hero-title span { color: var(--sky); }
+
+.hero-sub {
+  font-size: 15px;
+  color: #bbb;
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 380px;
+}
+
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-primary {
+  padding: 14px 28px;
+  background: var(--maroon);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.3px;
+}
+.btn-primary:hover { background: var(--maroon-light); box-shadow: 0 4px 20px rgba(122,0,32,0.5); transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-outline {
+  padding: 14px 28px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-outline:hover { background: var(--surface); border-color: #555; }
+
+/* Services strip */
+.services-strip {
+  padding: 36px 20px;
+  background: var(--bg);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.strip-label {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.service-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.service-card:hover { border-color: var(--maroon); transform: translateX(4px); }
+
+.service-info h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.service-info p { font-size: 13px; color: var(--muted); }
+
+.service-price {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 28px;
+  color: var(--sky);
+  letter-spacing: 1px;
+}
+
+/* bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(18,18,18,0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 850;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+  color: var(--muted);
+  font-size: 11px;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-tab .t-icon { font-size: 20px; }
+.nav-tab.active { color: var(--sky); }
+.nav-tab:hover { color: #ccc; }
+
+/* ── CALENDAR ── */
+#cal-container { max-width: 340px; margin: 0 auto; }
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cal-nav button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.cal-nav button:hover { background: var(--border); }
+
+.cal-month {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day-name {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-weight: 500;
+}
+.cal-day:hover:not(.empty):not(.past) { background: var(--surface2); }
+.cal-day.empty, .cal-day.past { color: #3a3a3a; cursor: default; pointer-events: none; }
+.cal-day.today { border: 1px solid var(--maroon); color: var(--sky); }
+.cal-day.selected { background: var(--maroon); color: #fff; border-radius: 12px; }
+
+/* ── TIP POPUP ── */
+#tip-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1100;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+#tip-overlay.open { opacity: 1; pointer-events: all; }
+
+.tip-sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  padding: 8px 24px 40px;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  max-width: 520px;
+  margin: 0 auto;
+}
+#tip-overlay.open .tip-sheet { transform: translateY(0); }
+
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 20px;
+}
+
+.tip-title { font-family: 'Bebas Neue', cursive; font-size: 26px; letter-spacing: 2px; margin-bottom: 6px; }
+.tip-date { font-size: 15px; color: var(--sky); margin-bottom: 20px; font-weight: 500; }
+
+.tip-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 16px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--maroon);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+.step-text strong { color: var(--sky); }
+
+.tip-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+
+.tip-btn {
+  padding: 15px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s, transform 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
+}
+.tip-btn:active { transform: scale(0.97); }
+.tip-btn.primary { background: var(--maroon); color: #fff; }
+.tip-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.tip-btn.sky { background: var(--sky-dim); color: #fff; }
+.tip-btn.ghost { background: transparent; color: var(--muted); font-size: 13px; font-weight: 400; }
+
+/* ── PROFILE ── */
+.profile-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--maroon), var(--sky-dim));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--sky-dim); }
+
+/* ── APPOINTMENTS ── */
+.appt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.appt-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+.appt-dot.done { background: var(--muted); }
+
+.appt-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.appt-info p { font-size: 12px; color: var(--muted); }
+
+.appt-del {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.appt-del:hover { background: #3a0010; color: #ff6b6b; border-color: #ff6b6b40; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-msg { font-size: 15px; line-height: 1.7; }
+
+/* ── REVIEWS ── */
+.review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.review-stars { color: #f59e0b; font-size: 16px; margin-bottom: 8px; }
+.review-text { font-size: 14px; line-height: 1.7; color: #ccc; margin-bottom: 10px; }
+.review-author { font-size: 12px; color: var(--muted); }
+
+/* ── HELP ── */
+.help-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.help-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.help-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+.cashapp-tag {
+  display: inline-block;
+  background: #1c4a2a;
+  color: #22c55e;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.screen-body > * {
+  animation: slideUp 0.35s ease both;
+}
+
+/* toast */
+#toast {
+  position: fixed;
+  bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  z-index: 1200;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
 </head>
 <body>
 
-  <header>
-    <div id="menu-button" onclick="toggleMenu()">☰</div>
-    <h1>Kojlux</h1>
-    <div id="calendar-icon" onclick="openSection('calendar')">📅</div>
-  </header>
+<!-- ── HEADER ── -->
+<header>
+  <div class="icon-btn" id="menu-btn" onclick="toggleDrawer()">☰</div>
+  <div class="logo">Kojlux</div>
+  <div class="icon-btn" onclick="openScreen('calendar')">📅</div>
+</header>
 
-  <nav id="side-menu" class="hidden">
-    <ul>
-      <li onclick="openSection('profile')">🧍‍♂️ Profile</li>
-      <li onclick="openSection('reviews')">💬 My Reviews</li>
-      <li onclick="openSection('appointments')">📅 My Appointments</li>
-      <li onclick="openSection('help')">❓ Help</li>
-    </ul>
-  </nav>
-
-  <section id="hero">
-    <div class="overlay">
-      <h2>Welcome to Kojlux Mobile Car Detailing</h2>
-      <p>Get your car looking like new with Kojlux. To book, tap the <strong>Book Now</strong> button below.</p>
-      <button class="book-button" onclick="alert('To book, click the calendar icon on the top right and select your date.')">Book Now</button>
+<!-- ── DRAWER OVERLAY ── -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<nav id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-logo">Kojlux</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-item" onclick="closeDrawer(); openScreen('profile')">
+      <span class="d-icon">🧍</span> My Profile
     </div>
-  </section>
+    <div class="drawer-item" onclick="closeDrawer(); openScreen('reviews')">
+      <span class="d-icon">💬</span> Reviews
+    </div>
+    <div class="drawer-item" onclick="closeDrawer(); openScreen('appointments')">
+      <span class="d-icon">📅</span> My Appointments
+    </div>
+    <div class="drawer-item" onclick="closeDrawer(); openScreen('help')">
+      <span class="d-icon">❓</span> Help & Booking Info
+    </div>
+  </div>
+  <div class="drawer-footer">Kojlux · Fresno, CA · © 2026</div>
+</nav>
 
-  <section id="services">
-    <h3>Our Services</h3>
-    <ul>
-      <li><strong>Full Detailing – $50</strong><br>Inside and outside cleaning</li>
-      <li><strong>Exterior Wash – $20</strong><br>Outside only</li>
-    </ul>
-  </section>
-
-  <section id="calendar" class="hidden">
-    <h3>Select a Date</h3>
-    <div id="calendar-container">
-      <div id="calendar-header">
-        <button id="prev-month">&lt;</button>
-        <h4 id="month-year"></h4>
-        <button id="next-month">&gt;</button>
+<!-- ── HOME ── -->
+<div id="home">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Fresno, CA · Mobile Detailing</div>
+      <h1 class="hero-title">Your Car.<br><span>Immaculate.</span></h1>
+      <p class="hero-sub">Professional mobile detailing that comes to you. We bring the shine directly to your driveway.</p>
+      <div class="cta-row">
+        <button class="btn-primary" onclick="openScreen('calendar')">📅 Book Now</button>
+        <button class="btn-outline" onclick="openScreen('help')">How It Works</button>
       </div>
-      <table id="calendar-table">
-        <thead>
-          <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
     </div>
-  </section>
-
-  <section id="profile" class="hidden"></section>
-  <section id="reviews" class="hidden"></section>
-  <section id="appointments" class="hidden"></section>
-  <section id="help" class="hidden">
-    <h3>How Kojlux Booking Works</h3>
-    <p>To book, click the calendar icon on the top right and select the date you’d like to book.</p>
-    <p>✅ Send a $1 tip to confirm your booking:</p>
-    <p><strong>Cash App: $16clem</strong></p>
-    <p>💵 Pay the remaining balance in cash on appointment day.</p>
-    <p>This ensures you’re serious and avoids no‑shows.</p>
-  </section>
-
-  <div id="tip-popup" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:1000;color:#fff;text-align:center;padding:30px;">
-  <h3>Before You Book</h3>
-  <p>Please send a $1 tip to confirm your booking.</p>
-  <button onclick="openCashApp()">Send Tip in Cash App</button><br><br>
-  <button onclick="continueToBooking()">I’ve Sent the Tip – Continue</button><br><br>
-  <button onclick="goToAppointments()">✅ Done – Go to My Appointments</button><br><br>
-  <button onclick="document.getElementById('tip-popup').classList.add('hidden')">Cancel</button>
-</div>
-
-    <h3>Before You Book</h3>
-    <p>Please send a $1 tip to confirm your booking.</p>
-    <button onclick="openCashApp()">Send Tip in Cash App</button><br><br>
-    <button onclick="continueToBooking()">I’ve Sent the Tip – Continue</button><br><br>
-    <button onclick="document.getElementById('tip-popup').classList.add('hidden')">Cancel</button>
   </div>
 
-  <footer>
-    <p>Kojlux – Fresno, CA | © 2025</p>
-  </footer>
+  <div class="services-strip">
+    <div class="strip-label">Our Services</div>
 
-  <script>
-    // MENU TOGGLE
-    function toggleMenu() {
-      const m = document.getElementById('side-menu');
-      m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    <div class="service-card">
+      <div class="service-info">
+        <h4>Full Detail</h4>
+        <p>Interior + exterior deep clean</p>
+      </div>
+      <div class="service-price">$50</div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-info">
+        <h4>Exterior Wash</h4>
+        <p>Outside only — quick & clean</p>
+      </div>
+      <div class="service-price">$20</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOTTOM NAV ── -->
+<div class="bottom-nav">
+  <button class="nav-tab active" id="tab-home" onclick="goHome()">
+    <span class="t-icon">🏠</span>Home
+  </button>
+  <button class="nav-tab" id="tab-calendar" onclick="openScreen('calendar')">
+    <span class="t-icon">📅</span>Book
+  </button>
+  <button class="nav-tab" id="tab-appointments" onclick="openScreen('appointments')">
+    <span class="t-icon">🗓️</span>Upcoming
+  </button>
+  <button class="nav-tab" id="tab-profile" onclick="openScreen('profile')">
+    <span class="t-icon">🧍</span>Profile
+  </button>
+</div>
+
+<!-- ═══════════════════════════════ SCREENS ═══════════════════════════════ -->
+
+<!-- CALENDAR SCREEN -->
+<div class="screen" id="screen-calendar">
+  <div class="screen-header">
+    <button class="back-btn" onclick="closeScreen('calendar')">←</button>
+    <span class="screen-title">Pick a Date</span>
+  </div>
+  <div class="screen-body">
+    <div id="cal-container">
+      <div class="cal-nav">
+        <button id="prev-btn">‹</button>
+        <span class="cal-month" id="cal-month-label"></span>
+        <button id="next-btn">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:24px;text-align:center;line-height:1.7;">
+      Select a date above to begin booking.<br>A $1 tip via Cash App confirms your slot.
+    </p>
+  </div>
+</div>
+
+<!-- PROFILE SCREEN -->
+<div class="screen" id="screen-profile">
+  <div class="screen-header">
+    <button class="back-btn" onclick="closeScreen('profile')">←</button>
+    <span class="screen-title">My Profile</span>
+  </div>
+  <div class="screen-body">
+    <div class="profile-avatar">🧍</div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="emailInput" placeholder="you@example.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone</label>
+      <input class="form-input" type="tel" id="phoneInput" placeholder="+1 (555) 000-0000"/>
+    </div>
+    <button class="btn-primary" onclick="saveProfile()" style="width:100%;margin-top:8px;">Save Profile</button>
+  </div>
+</div>
+
+<!-- APPOINTMENTS SCREEN -->
+<div class="screen" id="screen-appointments">
+  <div class="screen-header">
+    <button class="back-btn" onclick="closeScreen('appointments')">←</button>
+    <span class="screen-title">Appointments</span>
+  </div>
+  <div class="screen-body" id="appt-body"></div>
+</div>
+
+<!-- REVIEWS SCREEN -->
+<div class="screen" id="screen-reviews">
+  <div class="screen-header">
+    <button class="back-btn" onclick="closeScreen('reviews')">←</button>
+    <span class="screen-title">Reviews</span>
+  </div>
+  <div class="screen-body">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Came out to my house in under an hour. My car literally looked brand new — I was shocked at the difference. Worth every penny."</div>
+      <div class="review-author">— Marcus T., Fresno</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Super professional, showed up on time, and the detailing was impeccable. I'll be booking every month."</div>
+      <div class="review-author">— Destiny R., Clovis</div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <div class="review-text">"Great value for $50. Interior looks spotless. Would love a ceramic coat option added in the future!"</div>
+      <div class="review-author">— James K., Fresno</div>
+    </div>
+  </div>
+</div>
+
+<!-- HELP SCREEN -->
+<div class="screen" id="screen-help">
+  <div class="screen-header">
+    <button class="back-btn" onclick="closeScreen('help')">←</button>
+    <span class="screen-title">How It Works</span>
+  </div>
+  <div class="screen-body">
+    <div class="help-card">
+      <h4>📅 Step 1 — Pick a Date</h4>
+      <p>Tap the calendar icon or "Book Now" to open the date picker. Choose any available day.</p>
+    </div>
+    <div class="help-card">
+      <h4>💵 Step 2 — Send $1 to Confirm</h4>
+      <p>Send a $1 tip on Cash App to lock in your slot. This keeps things serious and avoids no-shows.</p>
+      <div class="cashapp-tag">💚 Cash App: $16clem</div>
+    </div>
+    <div class="help-card">
+      <h4>💬 Step 3 — Message on WhatsApp</h4>
+      <p>After sending the tip, tap "Contact on WhatsApp" to confirm your address, time, and service.</p>
+    </div>
+    <div class="help-card">
+      <h4>🚗 Step 4 — We Come to You</h4>
+      <p>Pay the remaining balance in cash when we arrive. Sit back and enjoy the results.</p>
+    </div>
+    <button class="btn-primary" onclick="window.open('https://cash.app/\$16clem','_blank')" style="width:100%;margin-top:8px;">
+      Open Cash App — $16clem
+    </button>
+  </div>
+</div>
+
+<!-- ── TIP POPUP SHEET ── -->
+<div id="tip-overlay">
+  <div class="tip-sheet">
+    <div class="sheet-handle"></div>
+    <div class="tip-title">Confirm Your Booking</div>
+    <div class="tip-date" id="tip-date-label">Loading...</div>
+
+    <div class="tip-step">
+      <div class="step-num">1</div>
+      <div class="step-text">Send a <strong>$1 tip</strong> on Cash App to <strong>$16clem</strong> to reserve your date.</div>
+    </div>
+    <div class="tip-step">
+      <div class="step-num">2</div>
+      <div class="step-text">Message on <strong>WhatsApp</strong> to confirm your address, time, and service.</div>
+    </div>
+    <div class="tip-step">
+      <div class="step-num">3</div>
+      <div class="step-text">Pay the <strong>remaining balance</strong> in cash when we arrive on your appointment day.</div>
+    </div>
+
+    <div class="tip-actions">
+      <button class="tip-btn primary" onclick="openCashApp()">💚 Send $1 on Cash App</button>
+      <button class="tip-btn sky" onclick="continueToBooking()">💬 Contact on WhatsApp</button>
+      <button class="tip-btn secondary" onclick="goToAppointments()">✅ Done — View My Appointments</button>
+      <button class="tip-btn ghost" onclick="closeTip()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<script>
+// ── DRAWER ──
+function toggleDrawer() {
+  document.getElementById('drawer').classList.toggle('open');
+  document.getElementById('drawer-overlay').classList.toggle('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+// ── SCREENS ──
+const screenIds = ['calendar','profile','appointments','reviews','help'];
+
+function openScreen(id) {
+  const el = document.getElementById('screen-' + id);
+  if (!el) return;
+  el.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.38s';
+  el.style.opacity = '1';
+  el.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  // update bottom nav
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('tab-' + id);
+  if (tab) tab.classList.add('active');
+  // load data
+  if (id === 'profile') loadProfile();
+  if (id === 'calendar') buildCalendar();
+  if (id === 'appointments') loadAppointments();
+}
+
+function closeScreen(id) {
+  const el = document.getElementById('screen-' + id);
+  if (!el) return;
+  el.classList.remove('active');
+  document.body.style.overflow = '';
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-home').classList.add('active');
+}
+
+function goHome() {
+  screenIds.forEach(id => {
+    const el = document.getElementById('screen-' + id);
+    if (el) el.classList.remove('active');
+  });
+  document.body.style.overflow = '';
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-home').classList.add('active');
+}
+
+// ── CALENDAR ──
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let calMonth, calYear, selectedDay = null;
+
+function buildCalendar() {
+  const now = new Date();
+  if (calMonth === undefined) { calMonth = now.getMonth(); calYear = now.getFullYear(); }
+  document.getElementById('cal-month-label').textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Day headers
+  DAYS.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-day-name';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayDate = now.getDate(), todayMonth = now.getMonth(), todayYear = now.getFullYear();
+
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('div'); e.className = 'cal-day empty'; grid.appendChild(e);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    cell.textContent = d;
+    const isPast = (calYear < todayYear) || (calYear === todayYear && calMonth < todayMonth) || (calYear === todayYear && calMonth === todayMonth && d < todayDate);
+    if (isPast) { cell.classList.add('past'); }
+    else {
+      if (calYear === todayYear && calMonth === todayMonth && d === todayDate) cell.classList.add('today');
+      cell.addEventListener('click', () => selectDay(cell, d));
     }
+    grid.appendChild(cell);
+  }
+}
 
-    // SECTION HANDLER
-    function openSection(id) {
-      ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
-        document.getElementById(s).classList.add('hidden');
-      });
-      if (id === 'profile') loadProfile();
-      if (id === 'calendar') buildCalendar();
-      const el = document.getElementById(id);
-      el.classList.remove('hidden');
-      document.getElementById('side-menu').style.display = 'none';
-      el.scrollIntoView({ behavior: 'smooth' });
-      alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
-    }
+function selectDay(cell, d) {
+  document.querySelectorAll('.cal-day.selected').forEach(c => c.classList.remove('selected'));
+  cell.classList.add('selected');
+  const full = new Date(calYear, calMonth, d);
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  window.pendingDate = full.toLocaleDateString('en-US', opts);
+  document.getElementById('tip-date-label').textContent = '📅 ' + window.pendingDate;
 
-    // PROFILE SECTION
-    function loadProfile() {
-      const e = localStorage.getItem('kojlux_email') || '';
-      const p = localStorage.getItem('kojlux_phone') || '';
-      document.getElementById('profile').innerHTML = `
-        <h3>My Profile</h3>
-        <label>Email:</label><br>
-        <input type="email" id="emailInput" value="${e}"><br><br>
-        <label>Phone:</label><br>
-        <input type="tel" id="phoneInput" value="${p}"><br><br>
-        <button onclick="saveProfile()">Save</button>
-      `;
-    }
+  // save immediately
+  let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+  if (!booked.some(b => b.date === window.pendingDate)) {
+    booked.push({ date: window.pendingDate, status: 'upcoming' });
+    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
+  }
+  showTip();
+}
 
-    function saveProfile() {
-      localStorage.setItem('kojlux_email', document.getElementById('emailInput').value);
-      localStorage.setItem('kojlux_phone', document.getElementById('phoneInput').value);
-      alert('Profile saved!');
-    }
+document.getElementById('prev-btn').addEventListener('click', () => {
+  calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+  buildCalendar();
+});
+document.getElementById('next-btn').addEventListener('click', () => {
+  calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+  buildCalendar();
+});
 
-    // CALENDAR
-    let today = new Date(),
-        currentMonth = today.getMonth(),
-        currentYear = today.getFullYear(),
-        lastCell = null;
+// ── TIP POPUP ──
+function showTip() { document.getElementById('tip-overlay').classList.add('open'); }
+function closeTip() { document.getElementById('tip-overlay').classList.remove('open'); }
+function openCashApp() { window.open('https://cash.app/$16clem','_blank'); }
+function continueToBooking() {
+  window.open('https://api.whatsapp.com/send?phone=15593168075','_blank');
+}
+function goToAppointments() {
+  closeTip();
+  closeScreen('calendar');
+  openScreen('appointments');
+}
 
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'],
-          tableBody = document.querySelector('#calendar-table tbody'),
-          monthYearText = document.getElementById('month-year');
+// ── PROFILE ──
+function loadProfile() {
+  document.getElementById('emailInput').value = localStorage.getItem('kojlux_email') || '';
+  document.getElementById('phoneInput').value = localStorage.getItem('kojlux_phone') || '';
+}
+function saveProfile() {
+  localStorage.setItem('kojlux_email', document.getElementById('emailInput').value);
+  localStorage.setItem('kojlux_phone', document.getElementById('phoneInput').value);
+  showToast('✅ Profile saved!');
+}
 
-    document.getElementById('prev-month').addEventListener('click', () => {
-      currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-      buildCalendar();
-    });
+// ── APPOINTMENTS ──
+function loadAppointments() {
+  const body = document.getElementById('appt-body');
+  const booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+  if (!booked.length) {
+    body.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-msg">No appointments yet.<br>Tap <strong>Book</strong> to get started.</div></div>`;
+    return;
+  }
+  body.innerHTML = booked.map((item, i) => `
+    <div class="appt-card">
+      <div class="appt-dot${item.status === 'done' ? ' done' : ''}"></div>
+      <div class="appt-info" style="flex:1">
+        <h4>${item.date}</h4>
+        <p style="text-transform:capitalize;">${item.status}</p>
+      </div>
+      <button class="appt-del" onclick="deleteAppt(${i})" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
 
-    document.getElementById('next-month').addEventListener('click', () => {
-      currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-      buildCalendar();
-    });
+function deleteAppt(i) {
+  let b = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
+  b.splice(i, 1);
+  localStorage.setItem('kojlux_bookings', JSON.stringify(b));
+  loadAppointments();
+  showToast('Appointment removed');
+}
 
-    function buildCalendar() {
-      tableBody.innerHTML = '';
-      monthYearText.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-      let firstDay = new Date(currentYear, currentMonth, 1).getDay(),
-          daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(),
-          date = 1;
-      for (let i = 0; i < 6; i++) {
-        const row = document.createElement('tr');
-        for (let j = 0; j < 7; j++) {
-          const cell = document.createElement('td');
-          if (i === 0 && j < firstDay || date > daysInMonth) {
-            cell.classList.add('disabled');
-          } else {
-            cell.textContent = date;
-            cell.addEventListener('click', () => selectDate(cell, date));
-            date++;
-          }
-          row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-        if (date > daysInMonth) break;
-      }
-    }
-
-    function selectDate(cell, date) {
-      if (cell.classList.contains('disabled')) return;
-      if (lastCell) lastCell.classList.remove('selected');
-      cell.classList.add('selected'); lastCell = cell;
-      document.getElementById('tip-popup').classList.remove('hidden');
-      const full = new Date(currentYear, currentMonth, date);
-      const opts = { year: 'numeric', month: 'long', day: 'numeric' };
-      window.pendingDate = full.toLocaleDateString('en-US', opts);
-    }
-
-    // FINAL WHATSAPP + CASH APP FUNCTIONS
-    function continueToBooking() {
-      window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
-    }
-
-    function openCashApp() {
-      window.open('https://cash.app/$16clem', '_blank');
-    }
-  </script>
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+</script>
 </body>
 </html>
-<script>
-  // Save the selected appointment to localStorage
-  function continueToBooking() {
-    if (!window.pendingDate) {
-      alert('No date selected!');
-      return;
-    }
-
-    // Get existing appointments
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-
-    // Add this one
-    booked.push({
-      date: window.pendingDate,
-      status: 'upcoming'
-    });
-
-    // Save back
-    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
-
-    // Open WhatsApp
-    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
-  }
-
-  // Load Appointments Section
-  function loadAppointments() {
-    let section = document.getElementById('appointments');
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-
-    if (booked.length === 0) {
-      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
-      return;
-    }
-
-    let html = '<h3>My Appointments</h3><ul>';
-    booked.forEach((item, i) => {
-      const color = item.status === 'done' ? 'red' : 'lightgreen';
-      html += `<li style="margin-bottom:10px;">
-        <span style="color:${color};">${item.date} – ${item.status}</span>
-        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
-      </li>`;
-    });
-    html += '</ul>';
-    section.innerHTML = html;
-  }
-
-  function deleteAppointment(index) {
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-    booked.splice(index, 1);
-    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
-    loadAppointments();
-  }
-
-  // Hook into section opening
-  function openSection(id) {
-    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
-      document.getElementById(s).classList.add('hidden');
-    });
-
-    if (id === 'profile') loadProfile();
-    if (id === 'calendar') buildCalendar();
-    if (id === 'appointments') loadAppointments(); // ✅ Hook added here
-
-    const el = document.getElementById(id);
-    el.classList.remove('hidden');
-    document.getElementById('side-menu').style.display = 'none';
-    el.scrollIntoView({ behavior: 'smooth' });
-    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
-  }
-</script>
-<script>
-  function selectDate(cell, date) {
-    if (cell.classList.contains('disabled')) return;
-
-    if (lastCell) lastCell.classList.remove('selected');
-    cell.classList.add('selected');
-    lastCell = cell;
-
-    const full = new Date(currentYear, currentMonth, date);
-    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
-    window.pendingDate = full.toLocaleDateString('en-US', opts);
-
-    // ✅ Save the selected date IMMEDIATELY to appointments
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-
-    // Check if already exists
-    if (!booked.some(b => b.date === window.pendingDate)) {
-      booked.push({ date: window.pendingDate, status: 'upcoming' });
-      localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
-    }
-
-    // Show tip popup
-    document.getElementById('tip-popup').classList.remove('hidden');
-  }
-
-  // Keep the booking and appointment display functions
-  function continueToBooking() {
-    window.open('https://api.whatsapp.com/send?phone=15593168075', '_blank');
-  }
-
-  function openCashApp() {
-    window.open('https://cash.app/$16clem', '_blank');
-  }
-
-  function loadAppointments() {
-    let section = document.getElementById('appointments');
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-
-    if (booked.length === 0) {
-      section.innerHTML = '<h3>My Appointments</h3><p>No appointments found.</p>';
-      return;
-    }
-
-    let html = '<h3>My Appointments</h3><ul>';
-    booked.forEach((item, i) => {
-      const color = item.status === 'done' ? 'red' : 'lightgreen';
-      html += `<li style="margin-bottom:10px;">
-        <span style="color:${color};">${item.date} – ${item.status}</span>
-        <button onclick="deleteAppointment(${i})" style="margin-left:10px;">Delete</button>
-      </li>`;
-    });
-    html += '</ul>';
-    section.innerHTML = html;
-  }
-
-  function deleteAppointment(index) {
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-    booked.splice(index, 1);
-    localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
-    loadAppointments();
-  }
-
-  function openSection(id) {
-    ['hero', 'services', 'calendar', 'profile', 'reviews', 'appointments', 'help'].forEach(s => {
-      document.getElementById(s).classList.add('hidden');
-    });
-
-    if (id === 'profile') loadProfile();
-    if (id === 'calendar') buildCalendar();
-    if (id === 'appointments') loadAppointments();
-
-    const el = document.getElementById(id);
-    el.classList.remove('hidden');
-    document.getElementById('side-menu').style.display = 'none';
-    el.scrollIntoView({ behavior: 'smooth' });
-    alert(`Scroll down to see your ${id.charAt(0).toUpperCase() + id.slice(1)} section.`);
-  }
-  </script>
-<script>
-  function selectDate(cell, day) {
-    if (cell.classList.contains('disabled')) return;
-
-    if (lastCell) lastCell.classList.remove('selected');
-    cell.classList.add('selected');
-    lastCell = cell;
-
-    const selectedDate = new Date(currentYear, currentMonth, day);
-    const formatted = selectedDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    window.pendingDate = formatted;
-
-    // Save appointment instantly
-    let booked = JSON.parse(localStorage.getItem('kojlux_bookings') || '[]');
-
-    if (!booked.some(b => b.date === formatted)) {
-      booked.push({ date: formatted, status: 'upcoming' });
-      localStorage.setItem('kojlux_bookings', JSON.stringify(booked));
-    }
-
-    // Show tip message
-    document.getElementById('tip-popup').classList.remove('hidden');
-  }
-</script>
-<script>
-  // Add new function to go to Appointments section
-  function goToAppointments() {
-    document.getElementById('tip-popup').classList.add('hidden');
-    openSection('appointments');
-  }
-</script>
-<script>
-// Store clicked calendar date into localStorage and show it in "My Appointments"
-document.addEventListener("DOMContentLoaded", function () {
-  const calendarDates = document.querySelectorAll(".calendar-date"); // Adjust to your calendar class
-  const appointmentList = document.getElementById("myAppointments"); // Section to show appointments
-
-  // Load saved appointments from localStorage
-  let savedAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
-
-  function renderAppointments() {
-    if (!appointmentList) return;
-    appointmentList.innerHTML = "";
-    savedAppointments.forEach((date) => {
-      const li = document.createElement("li");
-      li.textContent = date;
-      appointmentList.appendChild(li);
-    });
-  }
-
-  calendarDates.forEach((dateEl) => {
-    dateEl.addEventListener("click", function () {
-      const selectedDate = this.getAttribute("data-date");
-      if (!savedAppointments.includes(selectedDate)) {
-        savedAppointments.push(selectedDate);
-        localStorage.setItem("appointments", JSON.stringify(savedAppointments));
-        renderAppointments();
-      }
-    });
-  });
-
-  renderAppointments();
-});
-</script>
-<script>
-  // Make calendar memory strong
-  document.querySelectorAll('.calendar-date').forEach(dateEl => {
-    dateEl.addEventListener('click', () => {
-      const selectedDate = dateEl.getAttribute('data-date');
-
-      // Save to localStorage
-      let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-      if (!appointments.includes(selectedDate)) {
-        appointments.push(selectedDate);
-        localStorage.setItem('appointments', JSON.stringify(appointments));
-      }
-
-      // Add to My Appointments
-      updateAppointmentsUI();
-    });
-  });
-
-  function updateAppointmentsUI() {
-    const list = document.getElementById('myAppointments');
-    list.innerHTML = ''; // clear previous
-    let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-    appointments.forEach(date => {
-      const li = document.createElement('li');
-      li.textContent = date;
-      list.appendChild(li);
-    });
-  }
-
-  // Load on page
-  updateAppointmentsUI();
-</script>
