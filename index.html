@@ -224,10 +224,12 @@ header {
   min-height: calc(100vh - var(--header-h));
   background: url('https://upload.wikimedia.org/wikipedia/commons/6/6d/Lamborghini_Aventador_LP700-4.jpg') no-repeat center center / cover;
   display: flex;
-  align-items: flex-end;
-  padding: 40px 20px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 20px 12px;
   position: relative;
-}
+  padding-top: 0;
+}}
 
 .hero::before {
   content: '';
@@ -239,18 +241,14 @@ header {
   position: relative;
   z-index: 1;
   max-width: 500px;
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 48px;
 }
 
 .hero-tag {
-  display: inline-block;
-  background: var(--maroon);
-  color: #fff;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 20px;
-  margin-bottom: 14px;
+  display: none;
 }
 
 .hero-title {
@@ -268,6 +266,8 @@ header {
   line-height: 1.7;
   margin-bottom: 28px;
   max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -304,7 +304,7 @@ header {
 
 /* Services strip */
 .services-strip {
-  padding: 36px 20px;
+  padding: 16px 20px;
   background: var(--bg);
   max-width: 520px;
   margin: 0 auto;
